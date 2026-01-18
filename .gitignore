@@ -1,0 +1,16 @@
+.github/
+
+#Runtime data
+var/logs/*
+var/cache/*
+!var/logs/.gitkeep
+!var/cache/.gitkeep
+
+#Python
+__pycache__/
+*.pyc
+*.pyo
+
+#Reports
+share/docs/*.html
+share/docs/*.json
