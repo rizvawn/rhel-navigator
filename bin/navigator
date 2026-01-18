@@ -44,6 +44,37 @@ show_system_info() {
 	echo ""
 }
 
+run_system_checks() {
+	echo ""
+	echo -e "${GREEN}=== System Checks ===${NC}"
+	local checks_failed=0
+
+	if getent passwd rhel_student | grep -q ':2000'; then
+		echo -e "${GREEN}[✔]${NC} User 'rhel_student' exists with UID 2000"
+	else
+		echo -e "${RED}[✗]${NC} User 'rhel_student' not found or incorrect UID"
+		((checks_failed++))
+	fi
+
+	if [[ -f /opt/navigator-secrets/config ]]; then
+		permissions=$(stat -c '%a' /opt/navigator-secrets/config)
+		if [[ "$permissions" == "600" ]]; then
+			echo -e "${GREEN}[✔]${NC} Secret file has correct permissions (600)"
+		else
+			echo -e "${YELLOW}[!]${NC} Secret file permissions: $permissions (expected: 600)"
+			((checks_failed++))
+		fi
+	else
+		echo -e "${RED}[✗]${NC} Secret file not found"
+		((checks_failed++))
+	fi
+
+	echo ""
+
+	return $checks_failed
+		
+}
+
 main() {
 	
 	if [[ $# -eq 0 ]]; then
