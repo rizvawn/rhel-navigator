@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+set -euo pipefail 
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+show_help() {
+	echo ""
+	cat << EOF
+Usage: $(basename "$0") [OPTIONS]
+
+RHEL System Analysis Tool - Module 1: Core System Reconnaissance
+
+OPTIONS:
+	-h, --help	Show this help message
+	-i, --info	Display system information
+	-c, --check	Run system checks
+
+EXAMPLES:
+	$(basename "$0") --info
+	$(basename "$0") --check
+EOF
+echo ""
+}
+
+show_system_info() {
+	echo -e "\n${GREEN}=== System Information ===${NC}\n"
+
+	if [[ -f /etc/os-release ]]; then
+		source /etc/os-release
+		echo -e "OS Name:		${NAME}"
+		echo -e "Version:		${VERSION}"
+		echo -e "ID:			${ID}"
+	fi
+
+	echo -e "Kernel:			$(uname -r)"
+	echo -e "Hostname:		$(hostname)"
+	echo -e "Uptime:			$(uptime -p)"
+	echo ""
+}
+
+main() {
+	
+	if [[ $# -eq 0 ]]; then
+		show_help
+		exit 0
+	fi
+
+	case "$1" in
+		-h|--help)
+			show_help
+			;;
+		-i|--info)
+			show_system_info
+			;;
+		-c|--check)
+			run_system_checks
+			;;
+		*)
+			echo "Unknown option: $1"
+			show_help
+			exit 1
+			;;
+	esac
+}
+
+main "$@"
