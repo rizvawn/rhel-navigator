@@ -17,9 +17,10 @@ Usage: $(basename "$0") [OPTIONS]
 RHEL System Analysis Tool - Module 1: Core System Reconnaissance
 
 OPTIONS:
-	-h, --help	Show this help message
-	-i, --info	Display system information
-	-c, --check	Run system checks
+	-h, --help		Show this help message
+	-i, --info		Display system information
+	-c, --check		Run system checks
+	-u, --users 	List regular users
 
 EXAMPLES:
 	$(basename "$0") --info
@@ -86,6 +87,16 @@ run_system_checks() {
 		
 }
 
+list_users() {
+	echo -e "${GREEN}=== Regular Users (UID >= 1000) ===${NC}"
+
+	while IFS=: read -r username _ uid gid _ homedir shell; do
+		if [[ $uid -ge 1000 ]] && [[ $uid -ne 65534 ]]; then
+			echo -e "User: ${YELLOW}$username${NC} | UID: $uid | Home: $homedir | Shell: $shell"
+		fi
+	done < /etc/passwd
+}
+
 main() {
 	
 	if [[ $# -eq 0 ]]; then
@@ -102,6 +113,9 @@ main() {
 			;;
 		-c|--check)
 			run_system_checks
+			;;
+		-u|--users)
+			list_users
 			;;
 		*)
 			echo "Unknown option: $1"
