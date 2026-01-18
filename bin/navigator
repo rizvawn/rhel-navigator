@@ -69,6 +69,17 @@ run_system_checks() {
 		((checks_failed++))
 	fi
 
+	if [[ -f /etc/shadow ]]; then
+		shadow_permissions=$(stat -c '%a' /etc/shadow)
+		shadow_permissions=$(printf "%03d" "$shadow_permissions")
+		if [[ "$shadow_permissions" == "000" ]] || [[ "$shadow_permissions" == "400" ]]; then
+			echo -e "${GREEN}[✓]${NC} /etc/shadow has secure permissions ($shadow_permissions)"
+		else
+			echo -e "${RED}[✗]${NC} /etc/shadow permissions: $shadow_permissions (should be 000 or 400)"
+			((checks_failed++))
+		fi
+	fi
+
 	echo ""
 
 	return $checks_failed
