@@ -26,6 +26,7 @@ OPTIONS:
 	-d, --disk			Check storage and updates
 	-n, --network		Check network listeners
 	-p, --containers	Check container runtime
+	-b, --backup		Create backup archive
 
 EXAMPLES:
 	$(basename "$0") --info
@@ -211,6 +212,36 @@ check_containers() {
 	echo ""
 }
 
+create_backup() {
+	echo -e "\n${GREEN}=== Backup Archive ===${NC}\n"
+
+	local backup_dir="${PROJECT_ROOT}/var/cache"
+	local timestamp=$(date +%Y%m%d_%H%M%S)
+	local archive_name="navigator_backup_${timestamp}.tar.gz"
+	local archive_path="${backup_dir}/${archive_name}"
+
+	local items_to_backup=(
+		"${PROJECT_ROOT}/bin"
+		"${PROJECT_ROOT}/lib"
+		"${PROJECT_ROOT}/etc"
+	)
+
+	echo -e "${YELLOW}[i]${NC} Creating backup archive..."
+	tar -czf "$archive_path" -C "$PROJECT_ROOT" bin lib etc 2>/dev/null
+
+	if [[ -f "$archive_path" ]]; then
+		local size=$(du -h "$archive_path" | awk '{print $1}')
+		echo -e "${GREEN}[✓]${NC} Backup created: $archive_name ($size)"
+		echo -e "    Location: $archive_path"
+
+		local backup_count=$(find "$backup_dir" -name "navigator_backup_*.tar.gz" | wc -l)
+		echo -e "${YELLOW}[i]${NC} Total backups: $backup_count"
+	else
+		echo -e "${RED}[✗]${NC} Backup creation failed"
+	fi
+	echo ""
+}
+
 main() {
 	
 	if [[ $# -eq 0 ]]; then
@@ -245,6 +276,9 @@ main() {
 			;;
 		-p|--containers)
 			check_containers
+			;;
+		-b|--backup)
+			create_backup
 			;;
 		*)
 			echo "Unknown option: $1"
