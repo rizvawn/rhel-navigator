@@ -26,8 +26,8 @@ The Navigator is a progressive system reconnaissance tool built to audit Red Hat
 
 ## Skills Demonstrated
 
-- **RHEL System Administration**: User management with UID control, file permissions, filesystem hierarchy, system file analysis
-- **Shell Scripting**: Command-line argument parsing with case statements, error handling with `set -euo pipefail`, modular function design
+- **RHEL System Administration**: User management with UID control, file permissions, filesystem hierarchy, system file analysis, service management with systemd, log aggregation with journalctl, storage monitoring, package management
+- **Shell Scripting**: Command-line argument parsing with case statements, error handling with `set -euo pipefail`, modular function design, text processing with awk and grep
 - **Security Practices**: Permission auditing, secure file handling, password database protection
 - **Version Control**: Atomic commits with descriptive messages, feature-branch workflow
 - **Code Quality**: Defensive programming with input validation and graceful degradation
@@ -43,6 +43,15 @@ The Navigator is a progressive system reconnaissance tool built to audit Red Hat
 
 # User account enumeration
 ./bin/navigator --users
+
+# Service status monitoring
+./bin/navigator --services
+
+# Log analysis
+./bin/navigator --logs
+
+# Storage and package updates
+./bin/navigator --disk
 ```
 
 ## Project Structure

@@ -14,7 +14,7 @@ show_help() {
 	cat << EOF
 Usage: $(basename "$0") [OPTIONS]
 
-RHEL System Analysis Tool - Module 1: Core System Reconnaissance
+RHEL System Analysis Tool - Modules 1 & 2
 
 OPTIONS:
 	-h, --help		Show this help message
