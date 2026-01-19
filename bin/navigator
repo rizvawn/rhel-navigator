@@ -23,6 +23,7 @@ OPTIONS:
 	-u, --users 	List regular users
 	-s, --services	Check service status
 	-l, --logs		Analyze system logs
+	-d, --disk		Check storage and updates
 
 EXAMPLES:
 	$(basename "$0") --info
@@ -137,6 +138,26 @@ check_logs() {
 
 }
 
+check_storage() {
+	echo -e "\n${GREEN}=== Storage & Updates ===${NC}\n"
+	
+	local usage=$(df -h / | awk 'NR==2 {print $5}' | tr -d '%')
+	local used=$(df -h / | awk 'NR==2 {print $3}')
+	local total=$(df -h / | awk 'NR==2 {print $2}')
+
+	if [[ $usage -lt 80 ]]; then
+		echo -e "${GREEN}[✓]${NC} Root partition: $used / $total ($usage% used)"
+	else
+		echo -e "${YELLOW}[!]${NC} Root partition: $used / $total ($usage% used - over 80%)"
+	fi
+
+	echo ""
+
+	local update_count=$(sudo dnf check-update 2>/dev/null | grep -v "^$" | grep -v "Last metadata" | grep -E "^\S+\s+\S+\s+\S+" | wc -l)
+	echo -e "${YELLOW}[i]${NC} Available updates: $update_count packages"
+	echo  ""
+}
+
 main() {
 	
 	if [[ $# -eq 0 ]]; then
@@ -162,6 +183,9 @@ main() {
 			;;
 		-l|--logs)
 			check_logs
+			;;
+		-d|--disk)
+			check_storage
 			;;
 		*)
 			echo "Unknown option: $1"
