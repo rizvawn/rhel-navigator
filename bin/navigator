@@ -24,6 +24,7 @@ OPTIONS:
 	-s, --services	Check service status
 	-l, --logs		Analyze system logs
 	-d, --disk		Check storage and updates
+	-n, --network	Check network listeners
 
 EXAMPLES:
 	$(basename "$0") --info
@@ -175,6 +176,23 @@ check_storage() {
 	echo  ""
 }
 
+check_network() {
+	echo -e "\n${GREEN}=== Network Listeners ===${NC}\n"
+
+	if command -v ss &>/dev/null; then
+		local listen_count=$(ss -tuln | grep LISTEN | wc -l)
+		echo -e "${YELLOW}[i]${NC} Total listening ports: $listen_count"
+
+		if ss -tuln | grep -q ":8080"; then
+			local container=$(podman ps --format "{{.Names}}")
+			echo -e "${GREEN}[✓]${NC} Port 8080 is listening to $container container"
+		else
+			echo -e "${RED}[✗]${NC} Port 8080 not listening"
+		fi
+	fi
+	echo ""
+}
+
 main() {
 	
 	if [[ $# -eq 0 ]]; then
@@ -203,6 +221,9 @@ main() {
 			;;
 		-d|--disk)
 			check_storage
+			;;
+		-n|--network)
+			check_network
 			;;
 		*)
 			echo "Unknown option: $1"

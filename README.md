@@ -56,7 +56,7 @@ The Navigator is a progressive system reconnaissance tool built to audit Red Hat
 
 ## Project Structure
 
-```
+```text
 rhel-navigator/
 ├── bin/navigator        # Main executable (Bash)
 ├── etc/                 # Configuration files
