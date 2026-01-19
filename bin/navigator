@@ -107,10 +107,32 @@ run_system_checks() {
 		echo -e "${RED}[✗]${NC} Test log entry not found"
 	fi
 
-	if [[ $checks_failed -eq 0 ]]; then
-		echo -e "${GREEN}[✓]All checks are passed${NC}"
+	echo -e "\n${GREEN}=== Module 3: Networking &  Containers ===${NC}"
+	echo -e "${YELLOW}(Network services and container runtime)${NC}\n"
+
+	if ss -tuln | grep -q ":8080"; then
+		echo -e "${GREEN}[✓]${NC} Port 8080 is listening (container port)"
 	else
-		echo -e "${RED}[✗]Failed checks: $checks_failed"
+		echo -e "${RED}[✗]${NC} Port 8080 not listening"
+		((checks_failed++)) || true
+	fi
+
+	if command -v podman &>/dev/null; then
+		local container_count=$(podman ps --format "{{.Names}}" 2>/dev/null | wc -l)
+		if [[ $container_count -gt 0 ]]; then
+			echo -e "${GREEN}[✓]${NC} Podman containers running: $container_count"
+		else
+			echo -e "${YELLOW}[!]${NC} No containers running"
+		fi
+	else
+		echo -e "${RED}[✗]${NC} Podman not available"
+		((checks_failed++)) || true
+	fi
+
+	if [[ $checks_failed -eq 0 ]]; then
+		echo -e "\n${GREEN}[✓]All checks are passed${NC}"
+	else
+		echo -e "\n${RED}[✗]Failed checks: $checks_failed"
 	fi
 
 	echo ""		
