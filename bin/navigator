@@ -50,14 +50,17 @@ show_system_info() {
 
 run_system_checks() {
 	echo ""
-	echo -e "${GREEN}=== System Checks ===${NC}"
+
+	echo -e "${GREEN}=== Module 1: Core System Checks ===${NC}"
+	echo -e "${YELLOW}(User accounts and file permissions)${NC}\n"
+
 	local checks_failed=0
 
 	if getent passwd rhel_student | grep -q ':2000'; then
 		echo -e "${GREEN}[✔]${NC} User 'rhel_student' exists with UID 2000"
 	else
 		echo -e "${RED}[✗]${NC} User 'rhel_student' not found or incorrect UID"
-		((checks_failed++))
+		((checks_failed++)) || true
 	fi
 
 	if [[ -f /opt/navigator-secrets/config ]]; then
@@ -70,7 +73,7 @@ run_system_checks() {
 		fi
 	else
 		echo -e "${RED}[✗]${NC} Secret file not found"
-		((checks_failed++))
+		((checks_failed++)) || true
 	fi
 
 	if [[ -f /etc/shadow ]]; then
@@ -80,8 +83,25 @@ run_system_checks() {
 			echo -e "${GREEN}[✓]${NC} /etc/shadow has secure permissions ($shadow_permissions)"
 		else
 			echo -e "${RED}[✗]${NC} /etc/shadow permissions: $shadow_permissions (should be 000 or 400)"
-			((checks_failed++))
+			((checks_failed++)) || true
 		fi
+	fi
+
+	echo -e "\n${GREEN}=== Module 2: System Administration Checks ===${NC}"
+	echo -e "${YELLOW}(Services, logs and storage)${NC}\n"
+
+	if systemctl is-active --quiet httpd; then
+		echo -e "${GREEN}[✔]${NC} httpd service is running"
+	else
+		echo -e "${RED}[✗]${NC} httpd service is not active"
+		((checks_failed++)) || true
+	fi
+
+	local log_entry=$(sudo journalctl -t navigator-test --no-pager -n 1 2>/dev/null)
+	if [[ -n $log_entry ]]; then
+		echo -e "${GREEN}[✔]${NC} The following test log entry found:\n$log_entry"
+	else
+		echo -e "${RED}[✗]${NC} Test log entry not found"
 	fi
 
 	if [[ $checks_failed -eq 0 ]]; then
@@ -90,10 +110,7 @@ run_system_checks() {
 		echo -e "${RED}[✗]Failed checks: $checks_failed"
 	fi
 
-	echo ""
-
-	return $checks_failed
-		
+	echo ""		
 }
 
 list_users() {
