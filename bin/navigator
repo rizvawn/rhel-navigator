@@ -22,6 +22,7 @@ OPTIONS:
 	-c, --check		Run system checks
 	-u, --users 	List regular users
 	-s, --services	Check service status
+	-l, --logs		Analyze system logs
 
 EXAMPLES:
 	$(basename "$0") --info
@@ -120,6 +121,22 @@ check_services() {
 	echo ""
 }
 
+check_logs() {
+	echo -e "\n${GREEN}=== Log Analysis ===${NC}\n"
+
+	local last_entry=$(sudo journalctl -t navigator-test --no-pager -n 1 | tail -1)
+	if [[ -z $last_entry ]]; then
+		echo -e "${RED}[✗]${NC} Test log entry not found"
+	else
+		echo -e "${GREEN}[✓]${NC} Found the following test log entry: \n\n${YELLOW}$last_entry${NC}"	
+	fi
+
+	local error_count=$(sudo journalctl -p err --since "1 hour ago" --no-pager | grep -c "^")
+	echo -e "\n${YELLOW}[i]${NC} Errors in last hour: $error_count"
+	echo ""
+
+}
+
 main() {
 	
 	if [[ $# -eq 0 ]]; then
@@ -142,6 +159,9 @@ main() {
 			;;
 		-s|--services)
 			check_services
+			;;
+		-l|--logs)
+			check_logs
 			;;
 		*)
 			echo "Unknown option: $1"
