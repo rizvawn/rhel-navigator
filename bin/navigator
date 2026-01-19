@@ -63,7 +63,7 @@ run_system_checks() {
 			echo -e "${GREEN}[✔]${NC} Secret file has correct permissions (600)"
 		else
 			echo -e "${YELLOW}[!]${NC} Secret file permissions: $permissions (expected: 600)"
-			((checks_failed++))
+			((checks_failed++)) || true
 		fi
 	else
 		echo -e "${RED}[✗]${NC} Secret file not found"
@@ -79,6 +79,12 @@ run_system_checks() {
 			echo -e "${RED}[✗]${NC} /etc/shadow permissions: $shadow_permissions (should be 000 or 400)"
 			((checks_failed++))
 		fi
+	fi
+
+	if [[ $checks_failed -eq 0 ]]; then
+		echo -e "${GREEN}[✓]All checks are passed${NC}"
+	else
+		echo -e "${RED}[✗]Failed checks: $checks_failed"
 	fi
 
 	echo ""
