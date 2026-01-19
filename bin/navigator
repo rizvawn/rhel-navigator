@@ -17,14 +17,15 @@ Usage: $(basename "$0") [OPTIONS]
 RHEL System Analysis Tool - Modules 1 & 2
 
 OPTIONS:
-	-h, --help		Show this help message
-	-i, --info		Display system information
-	-c, --check		Run system checks
-	-u, --users 	List regular users
-	-s, --services	Check service status
-	-l, --logs		Analyze system logs
-	-d, --disk		Check storage and updates
-	-n, --network	Check network listeners
+	-h, --help			Show this help message
+	-i, --info			Display system information
+	-c, --check			Run system checks
+	-u, --users 		List regular users
+	-s, --services		Check service status
+	-l, --logs			Analyze system logs
+	-d, --disk			Check storage and updates
+	-n, --network		Check network listeners
+	-p, --containers	Check container runtime
 
 EXAMPLES:
 	$(basename "$0") --info
@@ -193,6 +194,23 @@ check_network() {
 	echo ""
 }
 
+check_containers() {
+	echo -e "\n${GREEN}=== Container Runtime ===${NC}\n"
+
+	if command -v podman &>/dev/null; then
+		if command -v python3 &>/dev/null; then
+			podman ps --format json | python3 "${PROJECT_ROOT}/lib/container_parser.py"
+		else
+			local count=$(podman ps --format "{{.Names}}" | wc -l)
+			echo -e "${YELLOW}[i]${NC} Running containers: $count"
+			podman ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}"
+		fi
+	else
+		echo -e "${RED}[✗]${NC} Podman not installed"
+	fi
+	echo ""
+}
+
 main() {
 	
 	if [[ $# -eq 0 ]]; then
@@ -224,6 +242,9 @@ main() {
 			;;
 		-n|--network)
 			check_network
+			;;
+		-p|--containers)
+			check_containers
 			;;
 		*)
 			echo "Unknown option: $1"
