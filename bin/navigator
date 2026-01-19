@@ -21,6 +21,7 @@ OPTIONS:
 	-i, --info		Display system information
 	-c, --check		Run system checks
 	-u, --users 	List regular users
+	-s, --services	Check service status
 
 EXAMPLES:
 	$(basename "$0") --info
@@ -103,6 +104,22 @@ list_users() {
 	done < /etc/passwd
 }
 
+check_services() {
+	echo -e "\n${GREEN}=== Service Status ===${NC}\n"
+	local services=("httpd" "sshd")
+
+	for service in "${services[@]}"; do
+		if command -v systemctl &>/dev/null; then
+			if systemctl is-active --quiet "$service"; then
+				echo -e "${GREEN}[✓]${NC} $service is active"
+			else
+				echo -e "${RED}[✗]${NC} $service is not running"
+			fi
+		fi
+	done
+	echo ""
+}
+
 main() {
 	
 	if [[ $# -eq 0 ]]; then
@@ -122,6 +139,9 @@ main() {
 			;;
 		-u|--users)
 			list_users
+			;;
+		-s|--services)
+			check_services
 			;;
 		*)
 			echo "Unknown option: $1"
