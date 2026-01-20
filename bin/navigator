@@ -108,8 +108,8 @@ run_system_checks() {
 		echo -e "${RED}[✗]${NC} Test log entry not found"
 	fi
 
-	echo -e "\n${GREEN}=== Module 3: Networking &  Containers ===${NC}"
-	echo -e "${YELLOW}(Network services and container runtime)${NC}\n"
+	echo -e "\n${GREEN}=== Module 3: Networking, Containers & SSH keys ===${NC}"
+	echo -e "${YELLOW}(Network services, container runtime and SSH keys permissions)${NC}\n"
 
 	if ss -tuln | grep -q ":8080"; then
 		echo -e "${GREEN}[✓]${NC} Port 8080 is listening (container port)"
@@ -127,6 +127,20 @@ run_system_checks() {
 		fi
 	else
 		echo -e "${RED}[✗]${NC} Podman not available"
+		((checks_failed++)) || true
+	fi
+
+	local test_key="${HOME}/.ssh/navigator_key"
+	if [[ -f "$test_key" ]]; then
+		local key_permissions=$(stat -c '%a' "$test_key")
+		if [[ "$key_permissions" == "600" ]]; then
+			echo -e "${GREEN}[✓]${NC} SSH key has secure permissions (600)"
+		else
+			echo -e "${RED}[✗]${NC} SSH key has permission: $key_permissions (should be 600)"
+			((checks_failed++)) || true
+		fi
+	else
+		echo -e "${RED}[✗]${NC} SSH key not found"
 		((checks_failed++)) || true
 	fi
 

@@ -14,7 +14,7 @@ The Navigator is a progressive system reconnaissance tool built to audit Red Hat
 
 **Current Capabilities**:
 
-*Configuration Phase*: Performed hands-on system administration tasks including creating a test user (`rhel_student`), establishing a secure configuration directory, implementing strict file permissions, managing system services (`httpd`), and deploying containerized applications with Podman.
+*Configuration Phase*: Performed hands-on system administration tasks including creating a test user (`rhel_student`), establishing a secure configuration directory, implementing strict file permissions, managing system services (`httpd`), deploying containerized applications with Podman, and generating SSH key pairs with Ed25519 encryption.
 
 *Validation Phase*: Built automated verification tooling that validates configuration through:
 
@@ -23,16 +23,17 @@ The Navigator is a progressive system reconnaissance tool built to audit Red Hat
 - **Architecture**:
   - Network listener auditing (`ss`) to verify open ports.
   - Container runtime analysis using **Python** to parse Podman JSON output.
+  - SSH key audit with permission validation (Ed25519 keys).
   - Automated backup generation with timestamped archives.
 
 ## Skills Demonstrated
 
-- **RHEL System Administration**: User management, file permissions, service management (systemd), log aggregation (journalctl), storage monitoring (LVM), package management (dnf).
+- **RHEL System Administration**: User management, file permissions, service management (systemd), log aggregation (journalctl), storage monitoring (LVM), package management (dnf), SSH key management.
 - **Containerization**: Managing OCI containers with Podman, inspecting container state via JSON.
 - **Scripting & Automation**:
   - **Bash**: Argument parsing, error handling, text processing (awk/grep).
   - **Python**: Integration for JSON parsing and robust logic handling.
-- **Security Practices**: Permission auditing, secure file handling, password database protection.
+- **Security Practices**: Permission auditing, secure file handling, password database protection, SSH key security.
 - **Version Control**: Atomic commits, feature-branch workflow.
 
 ## Usage Examples
@@ -55,6 +56,7 @@ The Navigator is a progressive system reconnaissance tool built to audit Red Hat
 # Network, Container, and Backup tools (Module 3)
 ./bin/navigator --network
 ./bin/navigator --containers
+./bin/navigator --ssh
 ./bin/navigator --backup
 ```
 
