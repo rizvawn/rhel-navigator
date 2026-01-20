@@ -10,27 +10,30 @@ The Navigator is a progressive system reconnaissance tool built to audit Red Hat
 
 **Architecture**: Single-binary design following the Filesystem Hierarchy Standard (FHS).
 
-**Technology Stack**: Bash for system-level operations and command orchestration.
+**Technology Stack**: Bash for system-level operations and command orchestration. Python for complex data parsing (JSON) and automation logic.
 
 **Current Capabilities**:
 
-*Configuration Phase*: Performed hands-on system administration tasks including creating a test user (`rhel_student`) with specific UID assignment (2000), establishing a secure configuration directory (`/opt/navigator-secrets`), and implementing strict file permissions (600) for sensitive data storage. These tasks demonstrate practical knowledge of user management (`useradd`), filesystem hierarchy usage, and security-conscious permission assignment.
+*Configuration Phase*: Performed hands-on system administration tasks including creating a test user (`rhel_student`), establishing a secure configuration directory, implementing strict file permissions, managing system services (`httpd`), and deploying containerized applications with Podman.
 
-*Validation Phase*: Built automated verification tooling that validates the manual configuration through:
+*Validation Phase*: Built automated verification tooling that validates configuration through:
 
-- System reconnaissance and OS fingerprinting via `/etc/os-release` parsing
-- User account auditing with `getent` and UID-based filtering for regular user identification
-- File permission validation using `stat` with normalized octal comparison
-- Security compliance checks for critical system files (`/etc/shadow` with 000/400 permission validation)
-- Color-coded terminal output for operational clarity
+- **Core System**: OS fingerprinting, User account auditing, File permission validation.
+- **Administration**: Service status monitoring (`systemctl`), Log analysis (`journalctl`), Storage/LVM usage checks.
+- **Architecture**:
+  - Network listener auditing (`ss`) to verify open ports.
+  - Container runtime analysis using **Python** to parse Podman JSON output.
+  - Automated backup generation with timestamped archives.
 
 ## Skills Demonstrated
 
-- **RHEL System Administration**: User management with UID control, file permissions, filesystem hierarchy, system file analysis, service management with systemd, log aggregation with journalctl, storage monitoring, package management
-- **Shell Scripting**: Command-line argument parsing with case statements, error handling with `set -euo pipefail`, modular function design, text processing with awk and grep
-- **Security Practices**: Permission auditing, secure file handling, password database protection
-- **Version Control**: Atomic commits with descriptive messages, feature-branch workflow
-- **Code Quality**: Defensive programming with input validation and graceful degradation
+- **RHEL System Administration**: User management, file permissions, service management (systemd), log aggregation (journalctl), storage monitoring (LVM), package management (dnf).
+- **Containerization**: Managing OCI containers with Podman, inspecting container state via JSON.
+- **Scripting & Automation**:
+  - **Bash**: Argument parsing, error handling, text processing (awk/grep).
+  - **Python**: Integration for JSON parsing and robust logic handling.
+- **Security Practices**: Permission auditing, secure file handling, password database protection.
+- **Version Control**: Atomic commits, feature-branch workflow.
 
 ## Usage Examples
 
@@ -44,14 +47,15 @@ The Navigator is a progressive system reconnaissance tool built to audit Red Hat
 # User account enumeration
 ./bin/navigator --users
 
-# Service status monitoring
+# Service, Log, and Storage checks (Module 2)
 ./bin/navigator --services
-
-# Log analysis
 ./bin/navigator --logs
-
-# Storage and package updates
 ./bin/navigator --disk
+
+# Network, Container, and Backup tools (Module 3)
+./bin/navigator --network
+./bin/navigator --containers
+./bin/navigator --backup
 ```
 
 ## Project Structure
@@ -60,9 +64,9 @@ The Navigator is a progressive system reconnaissance tool built to audit Red Hat
 rhel-navigator/
 ├── bin/navigator        # Main executable (Bash)
 ├── etc/                 # Configuration files
-├── lib/                 # Shared function libraries
+├── lib/                 # Shared function libraries (Python/Bash)
 ├── var/logs/            # Runtime logs
-├── var/cache/           # Temporary analysis data
+├── var/cache/           # Temporary analysis data & Backups
 └── share/docs/          # Generated reports
 ```
 

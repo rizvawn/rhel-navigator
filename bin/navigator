@@ -27,6 +27,7 @@ OPTIONS:
 	-n, --network		Check network listeners
 	-p, --containers	Check container runtime
 	-b, --backup		Create backup archive
+	-k, --ssh			Check SSH key configuration
 
 EXAMPLES:
 	$(basename "$0") --info
@@ -264,6 +265,31 @@ create_backup() {
 	echo ""
 }
 
+check_ssh_keys() {
+	echo -e "\n${GREEN}=== SSH Key Audit ===${NC}\n"
+
+	local ssh_dir="$HOME/.ssh"
+	local test_key="${ssh_dir}/navigator_key"
+
+	if [[ -f "$test_key" ]]; then
+		local key_permissions=$(stat -c '%a' "$test_key")
+		if [[ "$key_permissions" == "600" ]]; then
+			echo -e "${GREEN}[✓]${NC} SSH private key has secure permissions (600)"
+		else
+			echo -e "${RED}[✗]${NC} SSH private key permissions: $key_permissions (should be 600)"
+		fi
+
+		if [[ -f "${test_key}.pub" ]]; then
+			echo -e "${GREEN}[✓]${NC} SSH public key exists"
+			local key_type=$(ssh-keygen -l -f "${test_key}.pub" | awk '{print $NF}')
+			echo -e "${YELLOW}[i]${NC} Key type: $key_type"
+		fi
+	else
+		echo -e "${RED}[✗]${NC} SSH key not found at $test_key"
+	fi
+	echo ""
+}
+
 main() {
 	
 	if [[ $# -eq 0 ]]; then
@@ -301,6 +327,9 @@ main() {
 			;;
 		-b|--backup)
 			create_backup
+			;;
+		-k|--ssh)
+			check_ssh_keys
 			;;
 		*)
 			echo "Unknown option: $1"
